@@ -57,7 +57,7 @@ def waymo_novel_view_cameras(cameras: List[CameraInfo], ego_frame_poses, obj_inf
             # make novel view path
             shift, rotate = mode['shift'], mode['rotate']
             tag = ''
-            if shift != 0: tag += f'_shift_{shift:.2f}'
+            tag += f'_shift_{shift:.2f}'
             if rotate != 0: tag += f'_rotate_{rotate:.2f}'
             
             novel_view_dir = os.path.join(cfg.source_path, 'lidar', f'color_render{tag}')
@@ -112,7 +112,7 @@ def waymo_novel_view_cameras(cameras: List[CameraInfo], ego_frame_poses, obj_inf
                     skip_camera = True
                 break
 
-            skip_count += skip_camera
+            skip_count += skip_camera # TODO: 为什么这里要skip
             novel_view_camera.metadata['skip_camera'] = skip_camera  # will skip camera for training if this is present
 
             pbar.update()

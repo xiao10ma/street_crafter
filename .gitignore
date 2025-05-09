@@ -10,7 +10,7 @@ screenshots
 ckpts
 *.ply
 *.pt
-# *.png
+*.png
 *.jpg
 *.jpeg
 *.mp4

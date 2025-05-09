@@ -450,8 +450,9 @@ def parse_seq_rawdata(process_list, seq_path, seq_save_dir, skip_existing):
                     pose_idx = trajectory[track_id]['frames'].index(int(frame))
                     pose_vehicle = trajectory[track_id]['poses_vehicle'][pose_idx]
                     height, width, length = trajectory[track_id]['height'], trajectory[track_id]['width'], trajectory[track_id]['length']
+                    thresh = 0.5
                     box_mask = project_label_to_mask(
-                        dim=[length, width, height],
+                        dim=[length+thresh, width+thresh, height+thresh],
                         obj_pose=pose_vehicle,
                         calibration=None,
                         calibration_dict=calibration_dict,

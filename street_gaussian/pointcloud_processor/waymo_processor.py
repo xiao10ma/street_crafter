@@ -94,6 +94,7 @@ class WaymoPointCloudProcessor(BasePointCloudProcessor):
                 xyz = actor_ply.points[mask]
                 rgb = actor_ply.colors[mask]
 
+                # 镜像稠密
                 if self.trajectory is not None and not self.trajectory[track_id]['deformable']:
                     num_pointcloud_1 = (xyz[:, self.flip_axis] > 0).sum()
                     num_pointcloud_2 = (xyz[:, self.flip_axis] < 0).sum()
@@ -180,8 +181,8 @@ class WaymoPointCloudProcessor(BasePointCloudProcessor):
         rgb_save_path = camera.meta['guidance_rgb_path']
         mask_save_path = camera.meta['guidance_mask_path']
 
-        if os.path.exists(rgb_save_path) and os.path.exists(mask_save_path) and not cfg.diffusion.force_render_condition:
-            return
+        # if os.path.exists(rgb_save_path) and os.path.exists(mask_save_path) and not cfg.diffusion.force_render_condition:
+        #     return
 
         c2w = camera.get_extrinsic().cpu().numpy()
         ixt = camera.get_intrinsic().cpu().numpy()

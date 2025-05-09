@@ -35,24 +35,28 @@ class BasePointCloudProcessor(ABC):
         for frame in range(start_frame, end_frame + 1):
             bkgd_ply.append(self.ply_dict['background'][frame])
         bkgd_ply = np.concatenate(bkgd_ply, axis=0)  # [N, xyz + rgb]
+
+        from general_utils import load_ply
+        bk_xyz, bk_colors = load_ply('points3D_bkgd.ply')
+        bkgd_ply = np.concatenate([bk_xyz, bk_colors], axis=-1)
         ply_frame_dict['background'] = bkgd_ply
 
-        for actor_id in actor_ids:
-            if actor_id not in self.ply_dict:
-                continue
-            actor_ply = []
-            for frame in range(start_frame, end_frame + 1):
-                if frame not in self.ply_dict[actor_id]:
-                    continue
-                actor_ply.append(self.ply_dict[actor_id][frame])
+        # for actor_id in actor_ids:
+        #     if actor_id not in self.ply_dict:
+        #         continue
+        #     actor_ply = []
+        #     for frame in range(start_frame, end_frame + 1):
+        #         if frame not in self.ply_dict[actor_id]:
+        #             continue
+        #         actor_ply.append(self.ply_dict[actor_id][frame])
 
-            # empty actor ply
-            if len(actor_ply) == 0:
-                continue
+        #     # empty actor ply
+        #     if len(actor_ply) == 0:
+        #         continue
 
-            actor_ply = np.concatenate(actor_ply, axis=0)
+        #     actor_ply = np.concatenate(actor_ply, axis=0)
 
-            ply_frame_dict[actor_id] = actor_ply
+        #     ply_frame_dict[actor_id] = actor_ply
         return ply_frame_dict
 
     def transform_lidar_ply(self, lidar_ply, pose):

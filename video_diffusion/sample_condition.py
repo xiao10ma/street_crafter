@@ -16,6 +16,7 @@ from safetensors.torch import load_file as load_safetensors
 from torch import autocast
 import warnings
 from easyvolcap.utils.console_utils import *
+import torch.nn.functional as F
 warnings.filterwarnings("ignore")
 
 DATASET2SOURCES = {
@@ -438,6 +439,10 @@ class VideoDiffusionModel():
             z = self.model.encode_first_stage(value_dict['img_frames'])  # type: ignore
             unload_model(self.model.first_stage_model)  # type: ignore
 
+            ori_img_latent = self.model.encode_first_stage(batch['ori_img_seq'])
+            latent_h, latent_w = ori_img_latent.shape[-2:]
+            ori_mask_latent = F.interpolate(batch['ori_mask_seq'], size=(latent_h, latent_w), mode='nearest')
+
             samples_z = torch.zeros((self.num_rounds * (self.num_frames - 3) + 3, *z.shape[1:]), device='cuda')
 
             def denoiser(x, sigma, cond, cond_mask):
@@ -457,7 +462,9 @@ class VideoDiffusionModel():
                 uc=uc,
                 cond_frame=z,  # cond_frame will be rescaled when calling the sampler
                 cond_mask=cond_mask,
-                scale=scale
+                scale=scale,
+                ori_img_latent=ori_img_latent,
+                ori_mask_latent=ori_mask_latent
             )
             samples_z[:self.num_frames] = sample
 

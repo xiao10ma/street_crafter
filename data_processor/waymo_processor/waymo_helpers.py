@@ -277,5 +277,5 @@ def get_lane_shift_direction(ego_frame_poses, frame):
 
     ego_pose_delta = ego_pose_delta[:2]  # x, y
     ego_pose_delta /= np.linalg.norm(ego_pose_delta)
-    direction = np.array([ego_pose_delta[1], -ego_pose_delta[0], 0])  # y, -x
+    direction = np.array([ego_pose_delta[1], -ego_pose_delta[0], 0])  # y, -x 垂直方向
     return direction

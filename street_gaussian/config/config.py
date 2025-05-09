@@ -142,7 +142,7 @@ cfg.data.use_semantic = False
 cfg.data.use_mono_depth = False
 cfg.data.use_mono_normal = False
 cfg.data.use_colmap = True
-cfg.data.delta_frames = 10
+cfg.data.delta_frames = 50
 # data.load_pcd_from: Load the initialization point cloud from a previous experiment without generation.
 # data.extent: radius of the scene, we recommend 10 - 20 meters.
 # data.sphere_scale: Scale the sphere radius by this factor.
@@ -169,7 +169,7 @@ cfg.render.novel_view = CN()
 cfg.render.novel_view.name = 'test'
 cfg.render.novel_view.start_frame = -1
 cfg.render.novel_view.end_frame = -1
-cfg.render.novel_view.shift = [2.0, 3.0]
+cfg.render.novel_view.shift = [0.0]
 cfg.render.novel_view.rotate = 0.  # yaw offset
 cfg.render.novel_view.steps = 10
 cfg.render.novel_view.train_actor_distance_thresh = 1.5  # make sure all objects are 1 meter away from the camera during training

@@ -299,6 +299,18 @@ class WaymoDiffusionRunner(DiffusionRunner):
 
             else:
                 # TODO: Add disk cache for this if not using current rendering results as training free guidance
+                if guide_seq_path_sample[-5] == '0':
+                    inp_path = 'output/000000_0.png'
+                else:
+                    inp_path = 'output/000015_0.png'
+                from PIL import Image
+                inp_pil = Image.open(inp_path).convert('RGB')
+                resolution = (1600, 1066)
+                from street_gaussian.utils.general_utils import PILtoTorch
+                inp = PILtoTorch(inp_pil, resolution, resize_mode=Image.BILINEAR)
+
+                condition_camera.original_image = inp
+
                 cond_image = self.preprocess_tensor(condition_camera.original_image).to('cuda', non_blocking=True)
                 cond_image = cond_image * 2. - 1.
                 cond_image_mask = torch.ones_like(cond_image[0:1])
@@ -307,6 +319,26 @@ class WaymoDiffusionRunner(DiffusionRunner):
                 batch['training_free_guidance'] = False
                 batch['masked_guidance'] = False
             print(guide_seq_path_sample)
+            # diffusion 的 condition: Image ref + LiDAR render
+            # Image ref: 在去噪时，[25, latent_c, h, w] 每次去噪，都替换第 0 个
+            # LiDAR render: 在去噪时，作为 condition 以 zero conv 的方式加入
+
+            # 我要 inpaint，需要传入 原始图 + 对应 mask
+
+            ori_img_seq = []
+            ori_mask_seq = []
+            for i in range(1, len(guide_seq_path_sample)):
+                ori_img_path = guide_seq_path_sample[i].replace('lidar/color_render_shift_0.00', 'images')
+                ori_mask_path = guide_seq_path_sample[i].replace('lidar/color_render_shift_0.00', 'dynamic_mask')
+                ori_img = self.preprocess_image(ori_img_path, self.guide_preprocessor).to('cuda', non_blocking=True)
+                ori_mask = self.preprocess_image(ori_mask_path, self.default_preprocessor).to('cuda', non_blocking=True)[..., :1, :, :]
+                ori_img_seq.append(ori_img)
+                ori_mask_seq.append(ori_mask)
+            ori_img_seq = torch.stack(ori_img_seq, dim=0)
+            ori_mask_seq = torch.stack(ori_mask_seq, dim=0)
+            batch['ori_img_seq'] = ori_img_seq
+            batch['ori_mask_seq'] = ori_mask_seq
+
             diffusion_output = self.scene.diffusion.forward(batch, scale, cond_indices=[0])  # type: ignore
             diffusion_result[start_idx:end_idx] = diffusion_output[1:]  # (f, 3, h, w)
             filled[start_idx:end_idx] = True

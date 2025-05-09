@@ -124,3 +124,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    import oven
+    oven.notify('exp over')

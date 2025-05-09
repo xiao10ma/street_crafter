@@ -228,7 +228,7 @@ def generate_dataparser_outputs(
 
                 pose_vehicle, pose_world = make_obj_pose(ego_pose, pose)
 
-                camera_tracklets[cam, frame_idx, id, :7] = pose_world
+                camera_tracklets[cam, frame_idx, id, :7] = pose_world # obj's transform in world coord
                 camera_tracklets[cam, frame_idx, id, 7] = 1
 
     result = dict()

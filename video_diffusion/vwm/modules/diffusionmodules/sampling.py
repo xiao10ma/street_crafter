@@ -173,7 +173,9 @@ class EulerEDMSamplerSDS(SingleStepDiffusionSampler):
             cond_frame=None,
             cond_mask=None,
             num_steps=None,
-            scale=0.3
+            scale=0.3,
+            ori_img_latent=None,
+            ori_mask_latent=None
     ):
 
         sigmas = self.discretization(self.num_steps if num_steps is None else num_steps, device=self.device)  # type: ignore
@@ -202,6 +204,11 @@ class EulerEDMSamplerSDS(SingleStepDiffusionSampler):
                 if self.s_tmin <= sigmas[i] <= self.s_tmax
                 else 0.0
             )
+            noise = torch.randn_like(ori_img_latent)
+            sigma_t = sigmas[i]
+            ori_img_noisy = ori_img_latent + noise * sigma_t
+            x[1:, ...] = x[1:, ...] * ori_mask_latent + ori_img_noisy * (1 - ori_mask_latent)
+
             x = self.sampler_step(
                 s_in * sigmas[i],
                 s_in * sigmas[i + 1],
