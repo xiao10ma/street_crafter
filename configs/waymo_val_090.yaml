@@ -7,4 +7,4 @@ data:
 
 model:
     nsg:
-        include_sky: false
+        include_cube_map: False

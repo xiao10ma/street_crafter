@@ -36,9 +36,8 @@ class StreetGaussianModel(nn.Module):
 
         self.include_background = cfg.model.nsg.get('include_bkgd', True)
         self.include_obj = cfg.model.nsg.get('include_obj', True)
-        self.include_sky = cfg.model.nsg.get('include_sky', True)
-        assert cfg.data.white_background is False if self.include_sky else True
-        self.include_cube_map = cfg.model.nsg.get('include_cube_map', False)
+        self.include_sky = cfg.model.nsg.get('include_sky', False)
+        self.include_cube_map = cfg.model.nsg.get('include_cube_map', True)
         assert not (self.include_sky and self.include_cube_map)
 
         # fourier sh dimensions

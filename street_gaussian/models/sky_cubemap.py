@@ -18,7 +18,9 @@ class SkyCubeMap(nn.Module):
         super().__init__()
 
         self.cfg = cfg.model.sky
+        self.cfg.white_background = cfg.data.white_background
         self.resolution = self.cfg.resolution
+
         eps = 1e-3
 
         if self.cfg.white_background:

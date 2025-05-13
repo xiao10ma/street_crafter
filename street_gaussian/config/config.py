@@ -106,13 +106,12 @@ cfg.model.gaussian.semantic_mode = 'logits'
 cfg.model.nsg = CN()
 cfg.model.nsg.include_bkgd = True  # include background
 cfg.model.nsg.include_obj = True  # include object
-cfg.model.nsg.include_sky = True  # include sky
-cfg.model.nsg.include_cube_map = False  # include cube map
+cfg.model.nsg.include_sky = False  # include sky
+cfg.model.nsg.include_cube_map = True  # include cube map
 cfg.model.nsg.opt_track = False  # tracklets optimization
 cfg.model.sky = CN()
-cfg.model.sky.use_cube_map = False
 cfg.model.sky.resolution = 1024
-cfg.model.sky.white_background = True
+# cfg.model.sky.white_background = True
 
 
 # Note: these algorithms are not fully tested.
@@ -129,7 +128,7 @@ cfg.model.pose_correction.mode = 'image'  # If set to 'image', learn separate co
 ####
 
 cfg.data = CN()
-cfg.data.white_background = False  # If set to True, use white background. Should be False when using sky cubemap.
+cfg.data.white_background = True  # If set to True, use white background. 
 cfg.data.use_colmap_pose = False  # If set to True, use colmap to recalibrate camera poses as input (rigid bundle adjustment now).
 cfg.data.filter_colmap = False  # If set to True, filter out SfM points by camera poses.
 cfg.data.box_scale = 1.0  # Scale the bounding box by this factor.

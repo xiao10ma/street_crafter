@@ -67,6 +67,29 @@ python sample_condition.py
 
 We distill the video diffusion model into dynamic 3D representation based on the codebase of [Street Gaussians](https://zju3dv.github.io/street_gaussians/). Please refer to `street_gaussian/config/config.py` for details of parameters.
 
+<details> 
+<summary>Training tips</summary>
+
+  
+#### Breakpoint
+In the EasyVolCap framework, if you need to add breakpoints to the code, please use `breakpoint()`.
+
+#### Sky Model
+
+The initially released code contains a bug where the background color is set to black for all scenes.  
+The default sky representation has been changed to cubemap to align with the paper,.  
+However, the cubemap representation may cause artifacts in novel view synthesis, particularly in regions where the sky mask is inaccurate, such as cables.  
+For these scenes, there are two alternative options:  
+- **Option 1**: Set `model.nsg.include_sky` to `True` for scenes with large sky areas.  
+  In this case, the sky will be represented by a separate Gaussian model located outside a predefined sphere.  
+- **Option 2**: Set `model.nsg.include_cube_map` to `False` for scenes with small sky areas.  
+  In this case, the sky will be integrated into the background Gaussian model.
+  
+Remember that you need to set the `data.white_background` according to whether each scene is daytime or nighttime.
+
+</details>
+
+
 Train street gaussian
 ```
 python train.py --config {config_path} 

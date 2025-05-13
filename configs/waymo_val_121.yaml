@@ -7,11 +7,11 @@ data:
     split_train: -1
     split_test: 2
     type: Waymo
-    white_background: false
+    white_background: True
     selected_frames: [98, 198]
     cameras: [0]
     extent: 20.
-    use_colmap: true
+    use_colmap: True
 
 model:
     gaussian:
@@ -20,10 +20,11 @@ model:
         fourier_scale: 1.
         flip_prob: 0.2
     nsg:
-        include_bkgd: true
-        include_obj: true
-        include_sky: true
-        opt_track: true
+        include_bkgd: True
+        include_obj: True
+        include_sky: False
+        include_cube_map: True
+        opt_track: True
 
 train:
     iterations: 30000

@@ -107,23 +107,22 @@ class StreetGaussianRenderer():
         exclude_list = exclude_list + ['sky']
         include_list = list(set(pc.model_name_id.keys()) - set(exclude_list))
 
-        # Step1: render foreground
         pc.set_visibility(include_list)
         if parse_camera_again: pc.parse_camera(viewpoint_camera)
-
-        result = self.render_kernel(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color)
-
-        # Step2: render sky
         if pc.include_sky:
+            result = self.render_kernel(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color, white_background=False)
             result_sky = self.render_sky(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color, parse_camera_again=False)
             result['rgb'] = result['rgb'] + result_sky['rgb'] * (1 - result['acc'])
             result['viewspace_points_sky'] = result_sky['viewspace_points']
             result['visibility_filter_sky'] = result_sky['visibility_filter']
             result['radii_sky'] = result_sky['radii']
-        elif pc.include_sky_cubemap:
+        elif pc.include_cube_map:
+            result = self.render_kernel(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color, white_background=False)
             sky_color = pc.sky_cubemap(viewpoint_camera, result['acc'].detach()) # type: ignore
             # sky_color = pc.color_correction(viewpoint_camera, sky_color, use_sky=True) if use_color_correction else sky_color
             result['rgb'] = result['rgb'] + sky_color * (1 - result['acc'])
+        else:
+            result = self.render_kernel(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color)
 
         if pc.use_color_correction:
             result['rgb'] = pc.color_correction(viewpoint_camera, result['rgb']) # type: ignore
@@ -148,15 +147,18 @@ class StreetGaussianRenderer():
         include_list = list(set(pc.model_name_id.keys()) - set(exclude_list))
         pc.set_visibility(include_list)
         if parse_camera_again: pc.parse_camera(viewpoint_camera)
-        result = self.render_kernel(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color)
 
         if pc.include_sky:
+            result = self.render_kernel(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color, white_background=False)
             result_sky = self.render_sky(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color, parse_camera_again=False)
             result['rgb'] = result['rgb'] + result_sky['rgb'] * (1 - result['acc'])
-        elif pc.include_sky_cubemap:
+        elif pc.include_cube_map:
+            result = self.render_kernel(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color, white_background=False)
             sky_color = pc.sky_cubemap(viewpoint_camera, result['acc'].detach()) # type: ignore
             # sky_color = pc.color_correction(viewpoint_camera, sky_color, use_sky=True) if use_color_correction else sky_color
             result['rgb'] = result['rgb'] + sky_color * (1 - result['acc'])
+        else:
+            result = self.render_kernel(viewpoint_camera, pc, convert_SHs_python, compute_cov3D_python, scaling_modifier, override_color)
 
         result['rgb'] = torch.clamp(result['rgb'], 0., 1.)
 
@@ -264,6 +266,12 @@ class StreetGaussianRenderer():
 
         if use_depth:
             colors = torch.cat((colors, depths[..., None]), dim=-1)
+        
+        if white_background:
+            background = torch.cat((torch.ones_like(xyz3[:1, :]), torch.zeros_like(xyz3[:1, :1])), dim=-1)
+        else:
+            background = None
+        
         render_colors, render_alphas = rasterize_to_pixels(
             means2d,
             conics,
@@ -274,7 +282,7 @@ class StreetGaussianRenderer():
             tile_size,
             isect_offsets,
             flatten_ids,
-            backgrounds=None,
+            backgrounds=background,
             packed=False,
             absgrad=absgrad,
         )
