@@ -190,7 +190,7 @@ def training():
 
             # These regualrizations will not take effect since gts are not present in the guidance dict
             # sky loss
-            if optim_args.lambda_sky > 0 and gaussians.include_sky and sky_mask is not None:
+            if optim_args.lambda_sky > 0 and (gaussians.include_sky or gaussians.include_cube_map) and sky_mask is not None:
                 acc = torch.clamp(acc, min=1e-6, max=1. - 1e-6)
                 # sky_loss = torch.where(sky_mask, -torch.log(1 - acc), -torch.log(acc)).mean()
                 sky_loss = torch.where(sky_mask, -torch.log(1 - acc), -(acc * torch.log(acc) + (1. - acc) * torch.log(1. - acc))).mean()
