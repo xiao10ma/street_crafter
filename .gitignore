@@ -14,6 +14,7 @@ ckpts
 *.jpg
 *.jpeg
 *.mp4
+*.pkl
 
 video_diffusion/ckpts/
 video_diffusion/outputs/
@@ -21,3 +22,5 @@ video_diffusion/annos/
 video_diffusion/src/
 video_diffusion/logs/
 !video_diffusion/vwm/data/
+
+eval_output/
